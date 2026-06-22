@@ -44,22 +44,23 @@ Then your `pom.xml` only needs:
 </project>
 ```
 
-## Required files in your project
-
-Copy these from this repo and customize as needed:
-
-- `checkstyle.xml` — Checkstyle rules
-- `checkstyle-suppressions.xml` — Checkstyle suppressions (preconfigured to skip test sources)
-
 ## Overriding defaults
 
-Set properties in your project's `pom.xml` to override:
+Set properties in your project's `pom.xml` to override checkstyle config locations (must be on classpath or an absolute URL):
 
 ```xml
-<properties>
-    <checkstyle.configLocation>${project.basedir}/custom-checkstyle.xml</checkstyle.configLocation>
-    <checkstyle.suppressionsLocation>${project.basedir}/custom-suppressions.xml</checkstyle.suppressionsLocation>
-</properties>
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+                <configLocation>classpath:custom-checkstyle.xml</configLocation>
+                <suppressionsLocation>classpath:custom-suppressions.xml</suppressionsLocation>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 ```
 
 ## Publishing

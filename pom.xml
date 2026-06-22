@@ -9,6 +9,10 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>java-build-config</module>
+    </modules>
+
     <name>Soltyx Java Build</name>
     <description>Shared build configuration for Soltyx Java projects</description>
 
@@ -23,9 +27,7 @@
         <compiler.version>3.13.0</compiler.version>
         <surefire.version>3.5.2</surefire.version>
         <exec.version>3.5.0</exec.version>
-
-        <checkstyle.configLocation>${project.basedir}/checkstyle.xml</checkstyle.configLocation>
-        <checkstyle.suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</checkstyle.suppressionsLocation>
+        <java-build-config.version>1.0.0</java-build-config.version>
     </properties>
 
     <build>
@@ -80,10 +82,15 @@
                             <artifactId>checkstyle</artifactId>
                             <version>${checkstyle.version}</version>
                         </dependency>
+                        <dependency>
+                            <groupId>com.soltyx</groupId>
+                            <artifactId>java-build-config</artifactId>
+                            <version>${java-build-config.version}</version>
+                        </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>${checkstyle.configLocation}</configLocation>
-                        <suppressionsLocation>${checkstyle.suppressionsLocation}</suppressionsLocation>
+                        <configLocation>checkstyle.xml</configLocation>
+                        <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                         <consoleOutput>true</consoleOutput>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     </configuration>
@@ -96,20 +103,10 @@
             </plugins>
         </pluginManagement>
 
-        <plugins>
+<plugins>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals><goal>check</goal></goals>
-                        <phase>validate</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
