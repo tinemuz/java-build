@@ -1,10 +1,11 @@
-# Soltyx Java Build
+# Java Build
 
-Shared Maven parent POM for Soltyx Java projects. Provides:
+Shared Maven parent POM for personal Java projects. Provides:
 
 - **Java 25** compilation with Error Prone static analysis
 - **Spotless** formatting (trim trailing whitespace, end with newline, remove unused imports)
-- **Checkstyle** (Javadoc enforcement on public/protected members) — configs bundled automatically, no local copies needed
+- **PMD** (error-prone + performance rules, focused on actual bugs)
+- **SpotBugs** (findbugs successor, High threshold)
 - **Surefire** test runner
 - **exec-maven-plugin** (for jlink/jpackage tooling)
 
@@ -20,9 +21,9 @@ Add as parent in your project's `pom.xml`:
 </parent>
 ```
 
-Checkstyle configs are auto-unpacked from `java-build-config` to `target/checkstyle-config/` at build time. No files need to be copied.
+PMD rules and SpotBugs config are bundled via `java-build-config` jar, auto-unpacked at build time. No local files needed.
 
-Your `pom.xml` only needs project-specific bits — plugins, dependencies, profiles:
+Your `pom.xml` only needs project-specific bits:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -30,7 +31,7 @@ Your `pom.xml` only needs project-specific bits — plugins, dependencies, profi
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.soltyx</groupId>
+        <groupId>io.github.tinemuz</groupId>
         <artifactId>java-build</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -38,55 +39,58 @@ Your `pom.xml` only needs project-specific bits — plugins, dependencies, profi
     <artifactId>my-project</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals><goal>check</goal></goals>
-                        <phase>validate</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <dependencies>
+        ...
+    </dependencies>
 </project>
 ```
 
-## Overriding checkstyle rules
+PMD runs during `validate`, SpotBugs during `verify`. Override per-project:
 
-Child projects can override by adding a `<configuration>` block to their `maven-checkstyle-plugin` declaration:
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <configuration>
+                <rulesets>
+                    <ruleset>${project.basedir}/custom-ruleset.xml</ruleset>
+                </rulesets>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+
+## Excluding SpotBugs false positives
+
+Create `spotbugs-exclude.xml` in your project:
+
+```xml
+<FindBugsFilter>
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+        <Or>
+            <Class name="com.example.MyClass" />
+        </Or>
+    </Match>
+</FindBugsFilter>
+```
+
+Reference it:
 
 ```xml
 <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-checkstyle-plugin</artifactId>
+    <groupId>com.github.spotbugs</groupId>
+    <artifactId>spotbugs-maven-plugin</artifactId>
     <configuration>
-        <excludes>**/module-info.java</excludes>
+        <excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
     </configuration>
-    <executions>
-        <execution>
-            <goals><goal>check</goal></goals>
-            <phase>validate</phase>
-        </execution>
-    </executions>
 </plugin>
 ```
 
-For custom config locations, copy the XMLs from the `java-build` repo and set paths in `<configuration>`:
-
-```xml
-<configuration>
-    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
-    <suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
-</configuration>
-```
-
 ## First-time setup
-
-Add `java-build` and `java-build-config` to your local Maven repo:
 
 ```bash
 git clone https://github.com/tinemuz/java-build
@@ -97,10 +101,10 @@ mvn install
 ## Publishing updates
 
 ```bash
-mvn deploy                 # publishes to GitHub Packages
+GITHUB_TOKEN=<ghp_...> mvn deploy    # publish to GitHub Packages
 ```
 
-Requires `~/.m2/settings.xml` with a GitHub token:
+Requires a [classic PAT](https://github.com/settings/tokens) with `write:packages` scope in `~/.m2/settings.xml`:
 
 ```xml
 <settings>
