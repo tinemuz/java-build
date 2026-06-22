@@ -27,6 +27,7 @@
         <compiler.version>3.13.0</compiler.version>
         <surefire.version>3.5.2</surefire.version>
         <exec.version>3.5.0</exec.version>
+        <dependency-plugin.version>3.8.1</dependency-plugin.version>
         <java-build-config.version>1.0.0</java-build-config.version>
     </properties>
 
@@ -89,8 +90,8 @@
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>checkstyle.xml</configLocation>
-                        <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+                        <configLocation>${project.build.directory}/checkstyle-config/checkstyle.xml</configLocation>
+                        <suppressionsLocation>${project.build.directory}/checkstyle-config/checkstyle-suppressions.xml</suppressionsLocation>
                         <consoleOutput>true</consoleOutput>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     </configuration>
@@ -104,6 +105,29 @@
         </pluginManagement>
 
 <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-checkstyle-config</id>
+                        <phase>validate</phase>
+                        <goals><goal>unpack</goal></goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.soltyx</groupId>
+                                    <artifactId>java-build-config</artifactId>
+                                    <version>${java-build-config.version}</version>
+                                    <outputDirectory>${project.build.directory}/checkstyle-config</outputDirectory>
+                                    <includes>checkstyle*.xml</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>

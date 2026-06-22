@@ -4,7 +4,7 @@ Shared Maven parent POM for Soltyx Java projects. Provides:
 
 - **Java 25** compilation with Error Prone static analysis
 - **Spotless** formatting (trim trailing whitespace, end with newline, remove unused imports)
-- **Checkstyle** (Javadoc enforcement on public/protected members)
+- **Checkstyle** (Javadoc enforcement on public/protected members) — configs bundled automatically, no local copies needed
 - **Surefire** test runner
 - **exec-maven-plugin** (for jlink/jpackage tooling)
 
@@ -20,13 +20,13 @@ Add as parent in your project's `pom.xml`:
 </parent>
 ```
 
-Then your `pom.xml` only needs:
+Checkstyle configs are auto-unpacked from `java-build-config` to `target/checkstyle-config/` at build time. No files need to be copied.
+
+Your `pom.xml` only needs project-specific bits — plugins, dependencies, profiles:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 ...">
+<project ...>
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -38,36 +38,65 @@ Then your `pom.xml` only needs:
     <artifactId>my-project</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <dependencies>
-        ...
-    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>check</goal></goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 ```
 
-## Overriding defaults
+## Overriding checkstyle rules
 
-Set properties in your project's `pom.xml` to override checkstyle config locations (must be on classpath or an absolute URL):
+Child projects can override by adding a `<configuration>` block to their `maven-checkstyle-plugin` declaration:
 
 ```xml
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <configuration>
-                <configLocation>classpath:custom-checkstyle.xml</configLocation>
-                <suppressionsLocation>classpath:custom-suppressions.xml</suppressionsLocation>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-checkstyle-plugin</artifactId>
+    <configuration>
+        <excludes>**/module-info.java</excludes>
+    </configuration>
+    <executions>
+        <execution>
+            <goals><goal>check</goal></goals>
+            <phase>validate</phase>
+        </execution>
+    </executions>
+</plugin>
 ```
 
-## Publishing
+For custom config locations, copy the XMLs from the `java-build` repo and set paths in `<configuration>`:
+
+```xml
+<configuration>
+    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
+    <suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+</configuration>
+```
+
+## First-time setup
+
+Add `java-build` and `java-build-config` to your local Maven repo:
 
 ```bash
-mvn install                # install to local ~/.m2 for development
-mvn deploy                 # deploy to configured distribution management (future)
+git clone https://github.com/tinemuz/java-build
+cd java-build
+mvn install
 ```
 
-Projects that depend on this must have it in their local `.m2` or in a shared repository.
+## Publishing updates
+
+```bash
+mvn install                # install to local ~/.m2
+mvn deploy                 # deploy to shared repo (future)
+```
