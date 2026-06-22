@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.soltyx</groupId>
+    <groupId>io.github.tinemuz</groupId>
     <artifactId>java-build-config</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Soltyx Java Build Config</name>
+    <name>Java Build Config</name>
     <description>Shared checkstyle configuration bundled as a JAR</description>
 </project>

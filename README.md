@@ -14,7 +14,7 @@ Add as parent in your project's `pom.xml`:
 
 ```xml
 <parent>
-    <groupId>com.soltyx</groupId>
+    <groupId>io.github.tinemuz</groupId>
     <artifactId>java-build</artifactId>
     <version>1.0.0</version>
 </parent>
@@ -97,6 +97,19 @@ mvn install
 ## Publishing updates
 
 ```bash
-mvn install                # install to local ~/.m2
-mvn deploy                 # deploy to shared repo (future)
+mvn deploy                 # publishes to GitHub Packages
+```
+
+Requires `~/.m2/settings.xml` with a GitHub token:
+
+```xml
+<settings>
+    <servers>
+        <server>
+            <id>github</id>
+            <username>tinemuz</username>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+    </servers>
+</settings>
 ```

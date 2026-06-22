@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.soltyx</groupId>
+    <groupId>io.github.tinemuz</groupId>
     <artifactId>java-build</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -13,8 +13,8 @@
         <module>java-build-config</module>
     </modules>
 
-    <name>Soltyx Java Build</name>
-    <description>Shared build configuration for Soltyx Java projects</description>
+    <name>Java Build Parent</name>
+    <description>Shared Maven parent POM for personal Java projects</description>
 
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
@@ -22,8 +22,10 @@
 
         <error-prone.version>2.36.0</error-prone.version>
         <spotless.version>2.44.5</spotless.version>
-        <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
-        <checkstyle.version>10.23.1</checkstyle.version>
+        <pmd.version>7.17.0</pmd.version>
+        <pmd.plugin.version>3.28.0</pmd.plugin.version>
+        <spotbugs.version>4.10.2</spotbugs.version>
+        <spotbugs.plugin.version>4.10.2.0</spotbugs.plugin.version>
         <compiler.version>3.13.0</compiler.version>
         <surefire.version>3.5.2</surefire.version>
         <exec.version>3.5.0</exec.version>
@@ -75,25 +77,31 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${checkstyle.plugin.version}</version>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>${pmd.plugin.version}</version>
                     <dependencies>
                         <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>${checkstyle.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>com.soltyx</groupId>
+                            <groupId>io.github.tinemuz</groupId>
                             <artifactId>java-build-config</artifactId>
                             <version>${java-build-config.version}</version>
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>${project.build.directory}/checkstyle-config/checkstyle.xml</configLocation>
-                        <suppressionsLocation>${project.build.directory}/checkstyle-config/checkstyle-suppressions.xml</suppressionsLocation>
-                        <consoleOutput>true</consoleOutput>
-                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <rulesets>
+                            <ruleset>${project.build.directory}/pmd-config/pmd-ruleset.xml</ruleset>
+                        </rulesets>
+                        <failOnViolation>true</failOnViolation>
+                        <printFailingErrors>true</printFailingErrors>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs.plugin.version}</version>
+                    <configuration>
+                        <effort>Max</effort>
+                        <threshold>High</threshold>
+                        <failOnError>true</failOnError>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -104,24 +112,24 @@
             </plugins>
         </pluginManagement>
 
-<plugins>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>${dependency-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>unpack-checkstyle-config</id>
+                        <id>unpack-java-build-config</id>
                         <phase>validate</phase>
                         <goals><goal>unpack</goal></goals>
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.soltyx</groupId>
+                                    <groupId>io.github.tinemuz</groupId>
                                     <artifactId>java-build-config</artifactId>
                                     <version>${java-build-config.version}</version>
-                                    <outputDirectory>${project.build.directory}/checkstyle-config</outputDirectory>
-                                    <includes>checkstyle*.xml</includes>
+                                    <outputDirectory>${project.build.directory}/pmd-config</outputDirectory>
+                                    <includes>pmd-ruleset.xml</includes>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -132,6 +140,34 @@
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>check</goal></goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>check</goal></goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/tinemuz/java-build</url>
+        </repository>
+    </distributionManagement>
 </project>
