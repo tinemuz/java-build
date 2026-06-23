@@ -9,4 +9,4 @@ permissions:
 
 jobs:
   release:
-    uses: tinemuz/shared-workflows/.github/workflows/release.yml@main
+    uses: tinemuz/shared-workflows/.github/workflows/release.yml@v1
