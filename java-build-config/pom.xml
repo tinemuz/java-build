@@ -6,7 +6,7 @@
 
     <groupId>io.github.tinemuz</groupId>
     <artifactId>java-build-config</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>Java Build Config</name>

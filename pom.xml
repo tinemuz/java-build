@@ -28,9 +28,8 @@
         <spotbugs.plugin.version>4.10.2.0</spotbugs.plugin.version>
         <compiler.version>3.13.0</compiler.version>
         <surefire.version>3.5.2</surefire.version>
-        <exec.version>3.5.0</exec.version>
         <dependency-plugin.version>3.8.1</dependency-plugin.version>
-        <java-build-config.version>1.0.0</java-build-config.version>
+        <java-build-config.version>1.0.1</java-build-config.version>
     </properties>
 
     <build>
@@ -104,12 +103,7 @@
                         <failOnError>true</failOnError>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>${exec.version}</version>
-                </plugin>
-            </plugins>
+                </plugins>
         </pluginManagement>
 
         <plugins>
