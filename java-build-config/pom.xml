@@ -10,5 +10,13 @@
     <packaging>jar</packaging>
 
     <name>Java Build Config</name>
-    <description>Shared checkstyle configuration bundled as a JAR</description>
+    <description>Shared PMD configuration bundled as a JAR</description>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/tinemuz/java-build</url>
+        </repository>
+    </distributionManagement>
 </project>
