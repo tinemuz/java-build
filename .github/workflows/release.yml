@@ -3,35 +3,6 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: 25
-          distribution: oracle
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: GITHUB_TOKEN
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: latest
-
-      - name: Release
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          extra_plugins: |
-            @semantic-release/exec
-            conventional-changelog-conventionalcommits
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: tinemuz/shared-workflows/.github/workflows/release.yml@main
