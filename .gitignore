@@ -16,3 +16,8 @@ Thumbs.db
 
 ### Env ###
 .env
+
+### Node (semantic-release) ###
+node_modules/
+package.json
+package-lock.json

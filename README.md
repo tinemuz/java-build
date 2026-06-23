@@ -100,20 +100,25 @@ mvn install
 
 ## Publishing updates
 
+Push to `main` with conventional commits — the release workflow handles the rest automatically:
+
+| Commit type | Version bump | Example |
+|---|---|---|
+| `fix:` | Patch (1.0.0 → 1.0.1) | `fix: resolve NPE in parser` |
+| `feat:` | Minor (1.0.0 → 1.1.0) | `feat: add PMD ruleset` |
+| `feat!:` or `fix!:` | Major (1.0.0 → 2.0.0) | `feat!: redesign config API` |
+
+The workflow:
+1. Parses commits since last tag
+2. Bumps version in all `pom.xml` files via `mvn versions:set`
+3. Commits the version change and creates a git tag
+4. Deploys to GitHub Packages (`mvn deploy`)
+5. Creates a GitHub Release with changelog
+
+No PAT needed — the built-in `GITHUB_TOKEN` has sufficient permissions within Actions. For manual deploys from your machine, use:
+
 ```bash
-GITHUB_TOKEN=<ghp_...> mvn deploy    # publish to GitHub Packages
+GITHUB_TOKEN=<ghp_...> mvn deploy
 ```
 
-Requires a [classic PAT](https://github.com/settings/tokens) with `write:packages` scope in `~/.m2/settings.xml`:
-
-```xml
-<settings>
-    <servers>
-        <server>
-            <id>github</id>
-            <username>tinemuz</username>
-            <password>${env.GITHUB_TOKEN}</password>
-        </server>
-    </servers>
-</settings>
-```
+Requires a [classic PAT](https://github.com/settings/tokens) with `write:packages` scope.

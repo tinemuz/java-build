@@ -1,0 +1,16 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/exec", {
+      "prepareCmd": "mvn versions:set -DnewVersion=${nextRelease.version} -q && mvn versions:commit -q",
+      "publishCmd": "mvn deploy -DskipTests -q"
+    }],
+    ["@semantic-release/git", {
+      "assets": ["pom.xml", "java-build-config/pom.xml"],
+      "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+    }],
+    "@semantic-release/github"
+  ]
+}
